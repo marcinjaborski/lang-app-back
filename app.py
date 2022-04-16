@@ -1,14 +1,6 @@
-from flask import Flask
-from flask_cors import CORS
+from website import create_app
 
-app = Flask(__name__)
-CORS(app)
-
-
-@app.route('/hello')
-def hello_world():
-    return {'result': "Hello World"}
-
+app = create_app()
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
