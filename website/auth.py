@@ -53,18 +53,21 @@ def login():
     username = data.get('username')
     password = data.get('password')
 
+    if None in (username, password):
+        return {'message': 'Missing arguments'}, 400
+
     user = User.query.filter_by(username=username).first()
-    if user:
-        if user.verify_password(password):
-            token = jwt.encode({
-                'public_id': user.public_id,
-                'exp': datetime.utcnow() + timedelta(minutes=45),
-            }, app.config["SECRET_KEY"], algorithm="HS256")
-            return jsonify({'token': token})
-        else:
-            abort(404, 'Wrong password')
-    else:
-        abort(404, "User does not exist")
+    if not user:
+        return {'message': 'User does not exist'}, 404
+
+    if not user.verify_password(password):
+        return {'message': 'Wrong password'}, 404
+
+    token = jwt.encode({
+        'public_id': user.public_id,
+        'exp': datetime.utcnow() + timedelta(minutes=45),
+    }, app.config["SECRET_KEY"], algorithm="HS256")
+    return {'token': token}
 
 
 @auth.route('/logout')
@@ -77,16 +80,19 @@ def logout():
 @auth.route('/sign-up', methods=['POST'])
 def sign_up():
     data = request.get_json()
-    username = data['username']
-    email = data['email']
-    password = data['password']
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
+
+    if None in (username, email, password):
+        return {'message': 'Missing attributes'}, 400
 
     user_with_email = User.query.filter_by(email=email).first()
-    user_with_username = User.query.filter_by(email=email).first()
+    user_with_username = User.query.filter_by(username=username).first()
     if user_with_email:
-        abort(400, 'This email address is already in use')
+        return {'message': 'This email address is already in use'}, 400
     if user_with_username:
-        abort(400, 'This username is already in use')
+        return {'message': 'This username address is already in use'}, 400
 
     new_user = User()
     new_user.email = email
