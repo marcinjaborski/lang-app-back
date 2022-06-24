@@ -21,7 +21,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flask sqlalchemy pytest pytest-md pytest-emoji
+        pip install flask sqlalchemy flask_cors pytest pytest-md pytest-emoji
     - name: Test with pytest
       run: |
         pytest --emoji
