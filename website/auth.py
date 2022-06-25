@@ -34,14 +34,16 @@ def token_required(func):
             token = request.headers['x-access-tokens']
 
         if not token:
-            return jsonify({'message': 'a valid token is missing'})
+            return {'message': 'a valid token is missing'}, 400
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = User.query.filter_by(public_id=data['public_id']).first()
         except jwt.ExpiredSignatureError:
-            return jsonify({'message': 'token is expired, log in again'})
+            return {'message': 'token is expired, log in again'}, 400
         except jwt.InvalidTokenError:
-            return jsonify({'message': 'token is invalid'})
+            return {'message': 'token is invalid'}, 400
+        current_user = User.query.filter_by(public_id=data['public_id']).first()
+        if current_user is None:
+            return {'message': 'token in invalid, user does not exist'}, 404
         return func(current_user, *args, **kwargs)
 
     return wrapper

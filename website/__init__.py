@@ -4,7 +4,7 @@ from flask import Flask
 from flask_cors import CORS
 
 from .auth import decode_cookie
-from .models import User
+from .models import User, Note
 from .shared import db
 
 

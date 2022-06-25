@@ -31,4 +31,4 @@ def get_or_post_note(current_user):
                     excerpt=data.get('excerpt'), user_id=current_user.id)
     db.session.add(new_note)
     db.session.commit()
-    return jsonify({'message': 'new note created'})
+    return {'message': 'new note created'}
